@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -6,6 +8,15 @@ var logger = require('morgan');
 const expressSesssion = require('express-session');
 const passport = require('passport');
 const { Issuer, Strategy } = require('openid-client');
+
+// ensure all required environment variables are set
+const requiredEnvVars = ['OIDC_PROVIDER_URL', 'OIDC_CLIENT_ID'];
+requiredEnvVars.forEach(name => {
+  if (!process.env[name]) {
+    console.error(`Error: Environment variable ${name} is not set.`);
+    process.exit(1);
+  }
+})
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -24,14 +35,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 
-Issuer.discover('https://nodejs-sample.criipto.id')
+Issuer.discover(process.env.OIDC_PROVIDER_URL)
   .then(criiptoIssuer => {
     var client = new criiptoIssuer.Client({
-      client_id: 'urn:criipto:nodejs:demo:1010',
-      client_secret: 'j9wYVyD3zXZPMo3LTq/xSU/sMu9/shiFKpTHKfqAutM=',
-      redirect_uris: [ 'http://localhost:3000/auth/callback' ],
-      post_logout_redirect_uris: [ 'http://localhost:3000/logout/callback' ],
-      token_endpoint_auth_method: 'client_secret_post'
+      client_id: process.env.OIDC_CLIENT_URL,
+      client_secret: process.env.OIDC_CLIENT_URL,
+      redirect_uris: [ process.env.OIDC_REDIRECT_URL || 'http://localhost:3000/auth/callback' ],
+      post_logout_redirect_uris: [ process.env.OIDC_POST_REDIRECT_URL || 'http://localhost:3000/logout/callback' ],
+      token_endpoint_auth_method: process.env.OIDC_TOKEN_ENDPOINT_AUTH_METHOD || 'none'
     });
 
     app.use(
