@@ -38,8 +38,8 @@ app.use('/', indexRouter);
 Issuer.discover(process.env.OIDC_PROVIDER_URL)
   .then(criiptoIssuer => {
     var client = new criiptoIssuer.Client({
-      client_id: process.env.OIDC_CLIENT_URL,
-      client_secret: process.env.OIDC_CLIENT_URL,
+      client_id: process.env.OIDC_CLIENT_ID,
+      client_secret: process.env.OIDC_CLIENT_SECRET,
       redirect_uris: [ process.env.OIDC_REDIRECT_URL || 'http://localhost:3000/auth/callback' ],
       post_logout_redirect_uris: [ process.env.OIDC_POST_REDIRECT_URL || 'http://localhost:3000/logout/callback' ],
       token_endpoint_auth_method: process.env.OIDC_TOKEN_ENDPOINT_AUTH_METHOD || 'none'
