@@ -56,9 +56,11 @@ Issuer.discover(process.env.OIDC_PROVIDER_URL)
     app.use(passport.initialize());
     app.use(passport.session());
 
+    let TokenSet;
     passport.use(
       'oidc',
       new Strategy({ client }, (tokenSet, userinfo, done) => {
+        TokenSet = tokenSet;
         return done(null, tokenSet.claims());
       })
     );
@@ -88,7 +90,9 @@ Issuer.discover(process.env.OIDC_PROVIDER_URL)
 
     // start logout request
     app.get('/logout', (req, res) => {
-      res.redirect(client.endSessionUrl());
+      res.redirect(client.endSessionUrl({
+        id_token_hint: TokenSet.id_token
+      }));
     });
 
     // logout callback
